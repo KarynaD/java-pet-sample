@@ -3,7 +3,74 @@ services:
     image: task:latest
     build:
       context: ./task
-      dockerfile: Dockerfile
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=user
+      - RABBITMQ_PASSWORD=password
+    volumes:
+      - ./task/src:/app/src
+      - ./task/target:/app/target
+      - ./task/pom.xml:/app/pom.xml
     ports:
       - "8081:8081"
+    networks:
+      - app-network
+
+  user:
+    image: user:latest
+    build:
+      context: ./user
+    environment:
+      - DATABASE_URL=jdbc:postgresql://user-db:5432/users
+      - DATABASE_USERNAME=admin
+      - DATABASE_PASSWORD=admin
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=user
+      - RABBITMQ_PASSWORD=password
+    volumes:
+      - ./user/src:/app/src
+      - ./user/target:/app/target
+      - ./user/pom.xml:/app/pom.xml
+    ports:
+      - "8082:8082"
+    depends_on:
+      - user-db
+    networks:
+      - app-network
+
+  user-db:
+    image: postgres:latest
+    container_name: user-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: users
+      SPRING_DEVTOOLS_REMOTE: true
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    
+volumes:
+  user-db-data:
 

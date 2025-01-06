@@ -9,7 +9,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 
 # Указываем порт для приложения
-EXPOSE 8081
+EXPOSE 8082
 
 # Запуск через mvn spring-boot:run для поддержки hot reload
-ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring.devtools.restart.enabled=true", "-Dspring-boot.run.arguments=--server.port=8081"]
+ENTRYPOINT ["mvn", "spring-boot:run", "-Dspring.devtools.restart.enabled=true", "-Dspring-boot.run.arguments=--server.port=8082"]
