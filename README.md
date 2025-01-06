@@ -41,3 +41,9 @@ Java app integrated with AWS services
 
 1) spring boot app(crud) + rds
 2) docker(ecs)
+
+
+
+commands:
+docker-compose up --build
+
