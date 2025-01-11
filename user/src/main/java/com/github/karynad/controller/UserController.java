@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/save")
     public String save() {
-        userService.register(new UserDTO("039488547u", "rabb"));
+        userService.register(new UserDTO("385567844", "rabb"));
         return "Hello from user2";
     }
 

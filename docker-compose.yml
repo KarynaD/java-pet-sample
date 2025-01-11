@@ -14,6 +14,8 @@ services:
       - ./task/pom.xml:/app/pom.xml
     ports:
       - "8081:8081"
+    depends_on:
+      - rabbitmq
     networks:
       - app-network
 
@@ -36,7 +38,28 @@ services:
     ports:
       - "8082:8082"
     depends_on:
+      - rabbitmq
       - user-db
+    networks:
+      - app-network
+
+  notification:
+    image: notification:latest
+    build:
+      context: ./notification
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=user
+      - RABBITMQ_PASSWORD=password
+    volumes:
+      - ./notification/src:/app/src
+      - ./notification/target:/app/target
+      - ./notification/pom.xml:/app/pom.xml
+    ports:
+      - "8083:8083"
+    depends_on:
+      - rabbitmq
     networks:
       - app-network
 

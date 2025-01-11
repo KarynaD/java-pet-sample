@@ -1,9 +1,6 @@
 package com.github.karynad.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,17 +8,32 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Bean
+    public FanoutExchange userCreatedExchange() {
+        return new FanoutExchange("user.created.fanout.exchange");
+    }
+
+    @Bean
     public TopicExchange userExchange() {
-        return new TopicExchange("user-exchange");
+        return new TopicExchange("user.topic.exchange");
     }
 
     @Bean
     public Queue userCreatedQueue() {
-        return new Queue("user-created-queue");
+        return new Queue("task.user.created.queue");
     }
 
     @Bean
-    public Binding createdBinding(Queue userCreatedQueue, TopicExchange userExchange) {
-        return BindingBuilder.bind(userCreatedQueue).to(userExchange).with("user.created");
+    public Queue userDeletedQueue() {
+        return new Queue("task.user.deleted.queue");
+    }
+
+    @Bean
+    public Binding userCreatedBinding(Queue userCreatedQueue, FanoutExchange userCreatedExchange) {
+        return BindingBuilder.bind(userCreatedQueue).to(userCreatedExchange);
+    }
+
+    @Bean
+    public Binding userDeletedBinding(Queue userDeletedQueue, TopicExchange userExchange) {
+        return BindingBuilder.bind(userDeletedQueue).to(userExchange).with("user.deleted");
     }
 }

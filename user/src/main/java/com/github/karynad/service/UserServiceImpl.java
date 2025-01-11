@@ -46,8 +46,9 @@ public class UserServiceImpl implements UserService {
 
         // RabbitMQ
         for(int i=0; i<10; i++) {
-            rabbitTemplate.convertAndSend("user-exchange", "user.created", savedUser.getId() + "  " + savedUser.getUsername() + i);
+            rabbitTemplate.convertAndSend("user.created.fanout.exchange", "", savedUser.getId() + "  " + savedUser.getUsername() + i);
         }
+        rabbitTemplate.convertAndSend("user.topic.exchange", "user.deleted", savedUser.getId() + "  " + savedUser.getUsername());
 
         return savedUser;
     }
