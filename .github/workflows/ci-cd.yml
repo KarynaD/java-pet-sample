@@ -1,4 +1,4 @@
-name: CI/CD for Microservices
+name: CI/CD for Notification Service
 
 on:
   push:
@@ -9,9 +9,8 @@ on:
       - main
 
 jobs:
-  # Job для первого микросервиса
-  service1:
-    runs-on: ubuntu-latest
+  notification:
+    runs-on: ubuntu-22.04
 
     steps:
       # 1. Клонирование репозитория
@@ -39,11 +38,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # 5. Сборка и публикация Docker-образа
-      - name: Build and push Docker image for service-1
+      - name: Build and push Docker image for notification
         uses: docker/build-push-action@v4
         with:
-          context: ./service-1
+          context: ./notification
           push: true
           tags: karyna0dzen/notification:latest
-
-
