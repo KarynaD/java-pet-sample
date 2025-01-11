@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-user
+data:
+  DATABASE_URL: "jdbc:postgresql://host.docker.internal:5432/users" вот тут глянуть Если вы хотите интегрировать базу данных в Kubernetes:
+
+Создайте Service для PostgreSQL:
+  DATABASE_USERNAME: "admin"
+  DATABASE_PASSWORD: "admin"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: "user"
+  RABBITMQ_PASSWORD: "password"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user
+          image: user-prod:1
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: env-user
+          env:
+            - name: PORT
+              value: "8082"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+spec:
+  selector:
+    app: user
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8082
+      nodePort: 30082
